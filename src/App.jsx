@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useRef } from "react";
+import TodoList from "./TodoList";
+import {v4 as uuidv4 } from "uuid";
 
-function App() {
-  const [count, setCount] = useState(0)
+function App(){
+  const [todos, setTodos] = useState([{id: "1", name:"Todo1", complted: false}]);
 
-  return (
+  const todoNameref = useRef()
+  
+  const handleAddTodo = () => {
+    //タスクを追加する
+    const name = todoNameref.current.value;
+    setTodos((prevTodos) => { 
+      return [...prevTodos, {id: uuidv4(), name: name, complted: false }]
+    });
+    todoNameref.current.value = null;
+  };
+
+  //チェックマークをオンオフにする
+  const toggleTodo = (id) => {
+    const newTodo = [...todos];
+    const todo = newTodos.find((todo) => todo.id === id);
+    todo.completed = !todo.completed;
+    setTodos(newTodo)
+  }
+
+
+  return(
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <TodoList todos={todos}/>
+    <input type="text" ref={todoNameref}/>
+    <button onClick={handleAddTodo}>タスク追加</button>
+    <button>完了したタスクの削除</button>
+    <div>残りのタスク：{todos.filter((todo) => !todo.complted).length}</div>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App; 
